@@ -46,7 +46,7 @@ default_db = {
         "🇵🇰 Pakistan": [], "🇳🇵 Nepal": [], "🇧🇷 Brazil": [], "🇨🇳 China": [],
         "🇲🇦 Morocco": [], "🇸🇦 Saudi Arabia": [], "🇪🇬 Egypt": [], "🇬🇭 Ghana": [],
         "🇹🇿 Tanzania": [], "🇲🇲 Myanmar": [], "🇦🇫 Afghanistan": [], "🇪🇹 Ethiopia": [],
-        "🇵🇪 Peru (+51)": [], "🇯🇴 Jordan": [], "🇹🇯 Tajikistan": [],
+        "🇵🇪 Peru (+51)": [], "🇯🇴 Jordan": [], "🇹🇯 Tajikistan": [],"🇿🇼 Zimbabwe (+263)": [],
     },
     "🎵 TikTok": {
         "🇵🇰 Pakistan": [], "🇳🇵 Nepal": [], "🇧🇷 Brazil": [], "🇨🇳 China": [],

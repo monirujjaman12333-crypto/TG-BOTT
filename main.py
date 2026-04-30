@@ -2,9 +2,12 @@ import threading
 import socketserver
 from http.server import HTTPServer, BaseHTTPRequestHandler
 import os
+import requests
 
-# ✅ Port reuse fix — Address already in use সমস্যা দূর হবে
+# ✅ Port reuse fix
 socketserver.TCPServer.allow_reuse_address = True
+
+BOT_TOKEN = os.environ.get("BOT_TOKEN", "8369733496:AAFQMCynGk3I3IO3jaK13P6nlT0KCMSru00")
 
 class HealthHandler(BaseHTTPRequestHandler):
     def do_GET(self):
@@ -23,6 +26,18 @@ def run_health_server():
     print(f"✅ Health server running on port {port}")
     server.serve_forever()
 
+def delete_webhook():
+    """শুরুতেই webhook ও pending updates মুছে দাও — Conflict এড়াতে"""
+    try:
+        r = requests.post(
+            f"https://api.telegram.org/bot{BOT_TOKEN}/deleteWebhook",
+            json={"drop_pending_updates": True},
+            timeout=10
+        )
+        print(f"✅ Webhook deleted: {r.json()}")
+    except Exception as e:
+        print(f"⚠️ deleteWebhook error: {e}")
+
 def run_otp_monitor():
     try:
         import otp_monitor
@@ -40,11 +55,14 @@ def run_bot():
         print(f"⚠️ Bot error: {e}")
 
 if __name__ == "__main__":
-    # 1. Health server — একবারই চালু হবে
+    # 1. Webhook + pending updates মুছো — সবার আগে
+    delete_webhook()
+
+    # 2. Health server
     threading.Thread(target=run_health_server, daemon=True).start()
 
-    # 2. OTP Monitor — background thread
+    # 3. OTP Monitor — background thread
     threading.Thread(target=run_otp_monitor, daemon=True).start()
 
-    # 3. Bot — main thread এ চালাও
+    # 4. Bot — main thread এ চালাও
     run_bot()

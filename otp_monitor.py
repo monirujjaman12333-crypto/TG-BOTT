@@ -11,10 +11,10 @@ import db  # MongoDB module
 # =======================
 # Configuration
 # =======================
-TELEGRAM_BOT_TOKEN = "8369733496:AAFQMCynGk3I3IO3jaK13P6nlT0KCMSru00"
-TELEGRAM_CHAT_ID = "-1003221166532"
+TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "8369733496:AAFQMCynGk3I3IO3jaK13P6nlT0KCMSru00")
+TELEGRAM_CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID", "-1003221166532")
 HADI_API_URL = "http://147.135.212.197/crapi/had/viewstats"
-HADI_API_KEY = "RldTRDRSQkdngpFzh4lveGNXdl9SYIpYZmyCYXFq"
+HADI_API_KEY = os.environ.get("HADI_API_KEY", "RldTRDRSQkdngpFzh4lveGNXdl9SYIpYZmyCYXFq")
 POLL_INTERVAL = 2  # seconds
 
 # =======================
@@ -316,46 +316,49 @@ def init_seen():
     return seen
 
 # =======================
-# Main Loop
+# Main Loop (with auto-restart)
 # =======================
 def main():
     print("🚀 OTP Monitor started (MongoDB)...")
     seen = init_seen()
 
-    try:
-        while True:
-            data = fetch_hadi()
-            if not data or data.get("status") == "error":
-                time.sleep(POLL_INTERVAL)
-                continue
-
-            for item in data.get("data", []):
-                item_id = get_item_id(item)
-                if item_id in seen:
+    while True:
+        try:
+            while True:
+                data = fetch_hadi()
+                if not data or data.get("status") == "error":
+                    time.sleep(POLL_INTERVAL)
                     continue
 
-                group_text, otp, raw_phone = format_group_message(item)
+                for item in data.get("data", []):
+                    item_id = get_item_id(item)
+                    if item_id in seen:
+                        continue
 
-                if not otp:
+                    group_text, otp, raw_phone = format_group_message(item)
+
+                    if not otp:
+                        seen.add(item_id)
+                        db.save_seen(seen)
+                        continue
+
+                    # 1. Send to OTP group
+                    send_to_group(group_text, reply_markup=build_reply_markup())
+
+                    # 2. Notify user
+                    notify_user(raw_phone, otp)
+
                     seen.add(item_id)
                     db.save_seen(seen)
-                    continue
 
-                # 1. Send to OTP group
-                send_to_group(group_text, reply_markup=build_reply_markup())
+                time.sleep(POLL_INTERVAL)
 
-                # 2. Notify user
-                notify_user(raw_phone, otp)
-
-                seen.add(item_id)
-                db.save_seen(seen)
-
-            time.sleep(POLL_INTERVAL)
-
-    except KeyboardInterrupt:
-        print("🛑 Stopped.")
-    except Exception as e:
-        print(f"⚠️ Fatal error: {e}")
+        except KeyboardInterrupt:
+            print("🛑 Stopped.")
+            break
+        except Exception as e:
+            print(f"⚠️ OTP Monitor error: {e} — restarting in 5s...")
+            time.sleep(5)  # ✅ Error হলে auto-restart
 
 if __name__ == "__main__":
     main()

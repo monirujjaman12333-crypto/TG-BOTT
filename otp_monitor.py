@@ -11,7 +11,7 @@ import db  # MongoDB module
 # =======================
 # Configuration
 # =======================
-TELEGRAM_BOT_TOKEN = "8369733496:AAFu8IsP_H3kitEurVcC-xPoej2T9rtVeAA"
+TELEGRAM_BOT_TOKEN = "8369733496:AAFQMCynGk3I3IO3jaK13P6nlT0KCMSru00"
 TELEGRAM_CHAT_ID = "-1003221166532"
 HADI_API_URL = "http://147.135.212.197/crapi/had/viewstats"
 HADI_API_KEY = "RldTRDRSQkdngpFzh4lveGNXdl9SYIpYZmyCYXFq"

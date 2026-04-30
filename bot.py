@@ -17,7 +17,7 @@ from telegram.error import TimedOut, NetworkError
 import db  # MongoDB module
 
 # ================= CONFIG =================
-BOT_TOKEN = "8369733496:AAFu8IsP_H3kitEurVcC-xPoej2T9rtVeAA"
+BOT_TOKEN = "8369733496:AAFQMCynGk3I3IO3jaK13P6nlT0KCMSru00"
 ADMIN_ID = 7526594577
 SUPPORT_USERNAME = "@m_muin"
 OTP_GROUP_ID = -1003221166532
